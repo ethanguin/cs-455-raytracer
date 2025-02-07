@@ -16,6 +16,7 @@ void exportImage(const std::list<pixel> &pixel_values, int width, int height) {
         fileOut << pix << '\n';
     }
     fileOut.close();
+    return;
 }
 
 int main() {
