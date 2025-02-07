@@ -1,5 +1,18 @@
 #include "Raytracer.h"
 
+void Raytracer::initialize() {
+    viewportHeight = 2.0;
+    viewportWidth = scene.camera.aspectRatio * viewportHeight;
+    viewportU = Vect3<float>(viewportWidth, 0, 0);
+    viewportV = Vect3<float>(0, -viewportHeight, 0);
+    dU = viewportU / static_cast<float>(scene.camera.imgWidth);
+    dV = viewportV / static_cast<float>(scene.camera.imgHeight);
+    viewportUpLeft = scene.camera.pos 
+                    - Vect3<float>(0, 0, scene.camera.focalLength)
+                    - viewportU/2.0 - viewportV/2.0;
+    pixel00Pos = viewportUpLeft + (dU + dV)*.5;
+}
+
 std::list<pixel> Raytracer::startRaytrace() {
     std::list<pixel> pixelList;
     //put the pixels into a list

@@ -19,22 +19,19 @@ class Raytracer {
         Vect3<float> pixel00Pos;
     public:
         Scene scene;
+        Raytracer (int width, int height) {
+            scene.camera.imgWidth = width;
+            scene.camera.imgHeight = height;
+            initialize();
+        }
         Raytracer() {
-            viewportHeight = 2.0;
-            viewportWidth = scene.camera.aspectRatio * viewportHeight;
-            viewportU = Vect3<float>(viewportWidth, 0, 0);
-            viewportV = Vect3<float>(0, -viewportHeight, 0);
-            dU = viewportU / static_cast<float>(scene.camera.imgWidth);
-            dV = viewportV / static_cast<float>(scene.camera.imgHeight);
-            viewportUpLeft = scene.camera.pos 
-                            - Vect3<float>(0, 0, scene.camera.focalLength)
-                            - viewportU/2.0 - viewportV/2.0;
-            pixel00Pos = viewportUpLeft + (dU + dV)*.5;
+            initialize();
         }
         Raytracer(Scene new_scene) {
-            Raytracer();
             scene = new_scene;
+            initialize();
         }
+        void initialize();
         std::list<pixel> startRaytrace();
         Color traceRay(const Ray &r);
         
