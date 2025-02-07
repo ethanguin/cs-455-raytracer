@@ -11,11 +11,12 @@ bool is_file_exist(std::string fileName) {
     return infile.good();
 }
 
-void exportImage(const std::list<pixel> &pixel_values, int width, int height) {
-    std::string filename = "Raytrace_output0.ppm";
+void exportImage(std::string filename, const std::list<pixel> &pixel_values, int width, int height) {
+    int num = 0;
     while (is_file_exist(filename)) {
-        int num = 1;
-        filename = "Raytrace_output" + std::to_string(num) + ".ppm";
+        num++;
+        filename = filename.substr(0, filename.find_last_of(".")); //remove extension
+        filename = filename + std::to_string(num) + ".ppm";
     }
     std::ofstream fileOut(filename);
     if (!fileOut) {
@@ -30,12 +31,15 @@ void exportImage(const std::list<pixel> &pixel_values, int width, int height) {
     return;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     //pass properties to RayTracer
-    
+    std::string filename = "output.ppm";
+    if (argc > 1) {
+        filename = argv[1];
+    }
     Raytracer raytracer = Raytracer();
     //get the image, currently just purple pixels throughout
     std::list<pixel> image = raytracer.startRaytrace();
-    exportImage(image, raytracer.scene.camera.width, raytracer.scene.camera.height);
+    exportImage(filename, image, raytracer.scene.camera.width, raytracer.scene.camera.height);
     return 1;
 }
