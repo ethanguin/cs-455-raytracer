@@ -37,10 +37,9 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         fileName = argv[1];
     }
-    Raytracer raytracer = Raytracer();
+    fileName = "../output/" + fileName;
+    Raytracer raytracer = Raytracer(100, 100);
     //get the image, currently just a blue gradient
-    raytracer.scene.camera.imgWidth = 640;
-    raytracer.scene.camera.imgHeight = 480;
     std::list<pixel> image = raytracer.startRaytrace();
     exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
     return 1;
