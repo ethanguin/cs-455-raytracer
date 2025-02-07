@@ -5,52 +5,58 @@
 
 class Object_3D {
     public:
-        vect3<int> pos;
-        vect3<int> rot;
+        Vect3<float> pos;
+        Vect3<float> rot;
         Object_3D() {
-            pos = vect3<int>(0, 0, 0);
-            rot = vect3<int>(0, 0, 0);
+            pos = Vect3<float>(0, 0, 0);
+            rot = Vect3<float>(0, 0, 0);
         }
-        Object_3D(vect3<int> pos_input, vect3<int> rot_input) {
+        Object_3D(Vect3<float> pos_input, Vect3<float> rot_input) {
             pos = pos_input;
             rot = rot_input;
         }
-        Object_3D(int posx,int posy,int posz,int rotx,int roty,int rotz) {
-            pos = vect3<int>(posx, posy, posz);
-            rot = vect3<int>(rotx, roty, rotz);
+        Object_3D(float posx,float posy,float posz,float rotx,float roty,float rotz) {
+            pos = Vect3<float>(posx, posy, posz);
+            rot = Vect3<float>(rotx, roty, rotz);
         }
-        void move(int x, int y, int z);
+        void move(float x, float y, float z);
 };
 
 class Polygon : public Object_3D {
-    std::list<vect3<int> > verts;
+    std::list<Vect3<int> > verts;
 };
 
 class Camera : public Object_3D {
     public:
-        int width;
-        int height;
+        int imgWidth;
+        int imgHeight;
+        float aspectRatio;
+        float fov;
+        float focalLength;
         Camera() {
-            width = 1920;
-            height = 1080;
+            imgWidth = 1920;
+            imgHeight = 1080;
+            aspectRatio = (double)imgWidth / (double)imgHeight;
+            fov = 90.0;
+            focalLength = 1.0;
         }
 };
 
 class Light : public Object_3D {
     public:
-        vect3<int> color;
+        Color color;
         int intensity;
         Light() {}
 };
 class Light_Directional : public Light {
-    vect3<float> dir;
+    Vect3<float> dir;
     Light_Directional() {
-        dir = vect3<float>(-1, 0, 0);
+        dir = Vect3<float>(-1, 0, 0);
     }
-    Light_Directional(int posx, int posy, int posz, float dirx, float diry, float dirz) {
-        dir = vect3<float>(dirx, diry, dirz);
+    Light_Directional(float posx, float posy, float posz, float dirx, float diry, float dirz) {
+        dir = Vect3<float>(dirx, diry, dirz);
         dir = dir.normal();
-        pos = vect3<int>(posx, posy, posz);
+        pos = Vect3<float>(posx, posy, posz);
     }
 };
 

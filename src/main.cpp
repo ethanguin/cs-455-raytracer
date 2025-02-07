@@ -11,14 +11,14 @@ bool is_file_exist(std::string fileName) {
     return infile.good();
 }
 
-void exportImage(std::string filename, const std::list<pixel> &pixel_values, int width, int height) {
+void exportImage(std::string fileName, const std::list<pixel> &pixel_values, int width, int height) {
     int num = 0;
-    while (is_file_exist(filename)) {
+    std::string fileBase = fileName.substr(0, fileName.find_last_of(".")); //remove extension
+    while (is_file_exist(fileName)) {
         num++;
-        filename = filename.substr(0, filename.find_last_of(".")); //remove extension
-        filename = filename + std::to_string(num) + ".ppm";
+        fileName = fileBase + std::to_string(num) + ".ppm";
     }
-    std::ofstream fileOut(filename);
+    std::ofstream fileOut(fileName);
     if (!fileOut) {
         std::cerr << "Error: Could not open output.ppm for writing." << std::endl;
         return;
@@ -33,13 +33,15 @@ void exportImage(std::string filename, const std::list<pixel> &pixel_values, int
 
 int main(int argc, char* argv[]) {
     //pass properties to RayTracer
-    std::string filename = "output.ppm";
+    std::string fileName = "output.ppm";
     if (argc > 1) {
-        filename = argv[1];
+        fileName = argv[1];
     }
     Raytracer raytracer = Raytracer();
-    //get the image, currently just purple pixels throughout
+    //get the image, currently just a blue gradient
+    raytracer.scene.camera.imgWidth = 640;
+    raytracer.scene.camera.imgHeight = 480;
     std::list<pixel> image = raytracer.startRaytrace();
-    exportImage(filename, image, raytracer.scene.camera.width, raytracer.scene.camera.height);
+    exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
     return 1;
 }

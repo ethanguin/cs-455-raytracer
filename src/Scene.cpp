@@ -1,5 +1,5 @@
 #include "Scene.h"
 
-void Object_3D::move(int x, int y, int z) {
-    pos = vect3<int>(x, y, z);
+void Object_3D::move(float x, float y, float z) {
+    pos += Vect3<float>(x, y, z);
 }

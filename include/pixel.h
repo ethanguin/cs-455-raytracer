@@ -5,7 +5,7 @@
 #include <iostream>
 
 struct pixel {
-    vect3<int> RGB;
+    Vect3<int> RGB;
     pixel() {}
     pixel(int R_in, int G_in, int B_in) {
       RGB[0] = R_in;
