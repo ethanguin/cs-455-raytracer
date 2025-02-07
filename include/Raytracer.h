@@ -4,6 +4,7 @@
 #include <random>
 #include "pixel.h"
 #include "Scene.h"
+#include "Vect3.h"
 
 class Raytracer {
     public:

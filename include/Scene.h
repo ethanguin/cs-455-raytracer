@@ -5,25 +5,25 @@
 
 class Object_3D {
     public:
-        Vect3<int> pos;
-        Vect3<int> rot;
+        vect3<int> pos;
+        vect3<int> rot;
         Object_3D() {
-            pos = Vect3<int>(0, 0, 0);
-            rot = Vect3<int>(0, 0, 0);
+            pos = vect3<int>(0, 0, 0);
+            rot = vect3<int>(0, 0, 0);
         }
-        Object_3D(Vect3<int> pos_input, Vect3<int> rot_input) {
+        Object_3D(vect3<int> pos_input, vect3<int> rot_input) {
             pos = pos_input;
             rot = rot_input;
         }
         Object_3D(int posx,int posy,int posz,int rotx,int roty,int rotz) {
-            pos = Vect3<int>(posx, posy, posz);
-            rot = Vect3<int>(rotx, roty, rotz);
+            pos = vect3<int>(posx, posy, posz);
+            rot = vect3<int>(rotx, roty, rotz);
         }
         void move(int x, int y, int z);
 };
 
 class Polygon : public Object_3D {
-    std::list<Vect3<int> > verts;
+    std::list<vect3<int> > verts;
 };
 
 class Camera : public Object_3D {
@@ -38,19 +38,19 @@ class Camera : public Object_3D {
 
 class Light : public Object_3D {
     public:
-        Vect3<int> color;
+        vect3<int> color;
         int intensity;
         Light() {}
 };
 class Light_Directional : public Light {
-    Vect3<float> dir;
+    vect3<float> dir;
     Light_Directional() {
-        dir = Vect3<float>(-1, 0, 0);
+        dir = vect3<float>(-1, 0, 0);
     }
     Light_Directional(int posx, int posy, int posz, float dirx, float diry, float dirz) {
-        dir = Vect3<float>(dirx, diry, dirz);
-        dir = dir.normalized();
-        pos = Vect3<int>(posx, posy, posz);
+        dir = vect3<float>(dirx, diry, dirz);
+        dir = dir.normal();
+        pos = vect3<int>(posx, posy, posz);
     }
 };
 
