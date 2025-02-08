@@ -1,41 +1,62 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <list>
+#include <thread>
+#include <vector>
+#include <chrono>
 #include <string>
+#include "loadbar.h"
 #include "pixel.h"
-#include "Raytracer.h"
+#include "Raytracer.h"s
 
 bool is_file_exist(std::string fileName) {
     std::ifstream infile(fileName);
     return infile.good();
 }
 
-void exportImage(const std::list<pixel> &pixel_values, int width, int height) {
-    std::string filename = "Raytrace_output0.ppm";
-    while (is_file_exist(filename)) {
-        int num = 1;
-        filename = "Raytrace_output" + std::to_string(num) + ".ppm";
+void exportImage(std::string fileName, const std::vector<pixel> &pixel_values, int width, int height) {
+    int num = 0;
+    std::string fileBase = fileName.substr(0, fileName.find_last_of(".")); //remove extension
+    while (is_file_exist(fileName)) {
+        num++;
+        fileName = fileBase + std::to_string(num) + ".ppm";
     }
-    std::ofstream fileOut(filename);
+    std::ofstream fileOut(fileName);
     if (!fileOut) {
         std::cerr << "Error: Could not open output.ppm for writing." << std::endl;
         return;
     }
     fileOut << "P3\n" << width << ' ' << height << "\n255\n";
+    std::cout << "Exporting image to " << fileName << "..." << std::endl;
+    int count = 0;
     for (const auto &pix : pixel_values) {
         fileOut << pix << '\n';
+        count++;
+        if (count % width*10 == 0) {
+            showLoadingBar(count, width * height);
+        }
     }
     fileOut.close();
     return;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    auto start = std::chrono::high_resolution_clock::now(); // Start timer
     //pass properties to RayTracer
-    
-    Raytracer raytracer = Raytracer();
-    //get the image, currently just purple pixels throughout
-    std::list<pixel> image = raytracer.startRaytrace();
-    exportImage(image, raytracer.scene.camera.width, raytracer.scene.camera.height);
+    std::string fileName = "output.ppm";
+    if (argc > 1) {
+        fileName = argv[1];
+    }
+    fileName = "../output/" + fileName;
+    Raytracer raytracer = Raytracer(10000, 10000);
+    //get the image, currently just a blue gradient
+    std::vector<pixel> image = raytracer.startRaytrace();
+    auto endRay = std::chrono::high_resolution_clock::now(); // End timer
+    std::chrono::duration<double> durationRay = endRay - start;
+    std::cout << "Raytracing Done at: " << durationRay.count() << " seconds" << std::endl;
+    exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
+    auto end = std::chrono::high_resolution_clock::now(); // End timer
+    std::chrono::duration<double> duration = end - start;
+    std::cout << std::endl << "Time taken: " << duration.count() << " seconds" << std::endl;
     return 1;
 }
