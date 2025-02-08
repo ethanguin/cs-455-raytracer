@@ -6,6 +6,7 @@
 #include <chrono>
 #include <string>
 #include "pixel.h"
+#include "Scene.h"
 #include "Raytracer.h"
 
 bool is_file_exist(std::string fileName) {
@@ -41,8 +42,11 @@ int main(int argc, char* argv[]) {
         fileName = argv[1];
     }
     fileName = "../output/" + fileName;
-    Raytracer raytracer = Raytracer(10000, 10000);
-    //get the image, currently just a blue gradient
+    Scene scene = Scene();
+    scene.addSphere(0, 0, -1, 0.5);
+    scene.camera.imgWidth = 640;
+    scene.camera.imgHeight = 480;
+    Raytracer raytracer = Raytracer(scene);
     std::vector<pixel> image = raytracer.startRaytrace();
     exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
     auto end = std::chrono::high_resolution_clock::now(); // End timer

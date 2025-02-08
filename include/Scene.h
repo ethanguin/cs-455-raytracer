@@ -1,6 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 #include "Vect3.h"
+#include "Ray.h"
 #include <list>
 
 class Object_3D {
@@ -20,10 +21,24 @@ class Object_3D {
             rot = Vect3<float>(rotx, roty, rotz);
         }
         void move(float x, float y, float z);
+        virtual bool isHit(const Ray &r) const;
 };
 
 class Polygon : public Object_3D {
     std::list<Vect3<int> > verts;
+};
+
+class Sphere : public Object_3D {
+    public:
+        float radius;
+        Sphere() {
+            radius = 1.0;
+        }
+        Sphere(float posx, float posy, float posz, float radius_input) {
+            pos = Vect3<float>(posx, posy, posz);
+            radius = radius_input;
+        }
+        bool isHit(const Ray &r) const override;
 };
 
 class Camera : public Object_3D {
@@ -66,6 +81,9 @@ class Scene {
         Camera camera;
         std::list<Light> lights;
         Scene(){}
+        void addSphere(float posx, float posy, float posz, float radius) {
+            objects.push_back(Sphere(posx, posy, posz, radius));
+        }
 };
 
 #endif

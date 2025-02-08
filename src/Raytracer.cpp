@@ -40,11 +40,16 @@ std::vector<pixel> Raytracer::startRaytrace() {
         thread.join();
     }
 
-    std::clog << "\rDone.                 \n";
+    std::clog << "\rDone.\n";
     return pixelList;
 }
 
 Color Raytracer::traceRay(const Ray &r) {
+    for (const auto& sphere : scene.objects) {
+        if (sphere.isHit(r)) {
+            return Color(255, 0, 0);
+        }
+    }
     Vect3<float> normDir = r.direction().normal();
     float a = .5*(normDir.y() + 1.0);
     //std::cout << "normDir.y(): " << normDir.y() << ", a: " << a << std::endl;
