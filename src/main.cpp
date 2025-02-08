@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <list>
+#include <thread>
+#include <vector>
+#include <chrono>
 #include <string>
 #include "pixel.h"
 #include "Raytracer.h"
@@ -11,7 +13,7 @@ bool is_file_exist(std::string fileName) {
     return infile.good();
 }
 
-void exportImage(std::string fileName, const std::list<pixel> &pixel_values, int width, int height) {
+void exportImage(std::string fileName, const std::vector<pixel> &pixel_values, int width, int height) {
     int num = 0;
     std::string fileBase = fileName.substr(0, fileName.find_last_of(".")); //remove extension
     while (is_file_exist(fileName)) {
@@ -40,7 +42,7 @@ int main(int argc, char* argv[]) {
     fileName = "../output/" + fileName;
     Raytracer raytracer = Raytracer(100, 100);
     //get the image, currently just a blue gradient
-    std::list<pixel> image = raytracer.startRaytrace();
+    std::vector<pixel> image = raytracer.startRaytrace();
     exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
     return 1;
 }

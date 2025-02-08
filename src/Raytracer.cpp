@@ -13,8 +13,8 @@ void Raytracer::initialize() {
     pixel00Pos = viewportUpLeft + (dU + dV)*.5;
 }
 
-std::list<pixel> Raytracer::startRaytrace() {
-    std::list<pixel> pixelList;
+std::vector<pixel> Raytracer::startRaytrace() {
+    std::vector<pixel> pixelList;
     //put the pixels into a list
     for (int j = 0; j < scene.camera.imgHeight; j++){
         //std::clog << "\rScanlines remaining: " << (scene.camera.imgHeight - j) << ' ' << std::flush;

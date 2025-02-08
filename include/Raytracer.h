@@ -1,6 +1,6 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
-#include <list>
+#include <vector>
 #include <random>
 #include "pixel.h"
 #include "Scene.h"
@@ -32,7 +32,7 @@ class Raytracer {
             initialize();
         }
         void initialize();
-        std::list<pixel> startRaytrace();
+        std::vector<pixel> startRaytrace();
         Color traceRay(const Ray &r);
         
 };
