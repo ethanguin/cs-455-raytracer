@@ -5,6 +5,7 @@
 #include <vector>
 #include <chrono>
 #include <string>
+#include "loadbar.h"
 #include "pixel.h"
 #include "Scene.h"
 #include "Raytracer.h"
@@ -27,8 +28,14 @@ void exportImage(std::string fileName, const std::vector<pixel> &pixel_values, i
         return;
     }
     fileOut << "P3\n" << width << ' ' << height << "\n255\n";
+    std::cout << "Exporting image to " << fileName << "..." << std::endl;
+    int count = 0;
     for (const auto &pix : pixel_values) {
         fileOut << pix << '\n';
+        count++;
+        if (count % width*10 == 0) {
+            showLoadingBar(count, width * height);
+        }
     }
     fileOut.close();
     return;
@@ -48,9 +55,12 @@ int main(int argc, char* argv[]) {
     scene.camera.imgHeight = 480;
     Raytracer raytracer = Raytracer(scene);
     std::vector<pixel> image = raytracer.startRaytrace();
+    auto endRay = std::chrono::high_resolution_clock::now(); // End timer
+    std::chrono::duration<double> durationRay = endRay - start;
+    std::cout << "Raytracing Done at: " << durationRay.count() << " seconds" << std::endl;
     exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
     auto end = std::chrono::high_resolution_clock::now(); // End timer
     std::chrono::duration<double> duration = end - start;
-    std::cout << "Time taken: " << duration.count() << " seconds" << std::endl;
+    std::cout << std::endl << "Time taken: " << duration.count() << " seconds" << std::endl;
     return 1;
 }

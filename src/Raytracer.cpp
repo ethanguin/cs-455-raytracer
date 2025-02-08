@@ -39,8 +39,6 @@ std::vector<pixel> Raytracer::startRaytrace() {
     for (auto& thread : threads) {
         thread.join();
     }
-
-    std::clog << "\rDone.\n";
     return pixelList;
 }
 
