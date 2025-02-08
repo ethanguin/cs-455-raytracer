@@ -13,23 +13,33 @@ void Raytracer::initialize() {
     pixel00Pos = viewportUpLeft + (dU + dV)*.5;
 }
 
-std::vector<pixel> Raytracer::startRaytrace() {
-    std::vector<pixel> pixelList;
-    //put the pixels into a list
-    for (int j = 0; j < scene.camera.imgHeight; j++){
-        //std::clog << "\rScanlines remaining: " << (scene.camera.imgHeight - j) << ' ' << std::flush;
-        for (int i = 0; i < scene.camera.imgWidth; i++){
-            //send a ray through the pixel center
-            //current pixel center is + pixel size from the previous pixel center
-            auto pixelCenter = pixel00Pos + static_cast<float>(i)*dU + static_cast<float>(j)*dV;
+void Raytracer::traceChunk(int startY, int endY, std::vector<pixel>& pixelList) {
+    for (int j = startY; j < endY; ++j) {
+        for (int i = 0; i < scene.camera.imgWidth; ++i) {
+            auto pixelCenter = pixel00Pos + static_cast<float>(i) * dU + static_cast<float>(j) * dV;
             auto rayDir = pixelCenter - scene.camera.pos;
             Ray r = Ray(scene.camera.pos, rayDir);
-            //get the color of the pixel
             Color pixelColor = traceRay(r);
-            pixelList.push_back(pixel(pixelColor.x(), pixelColor.y(), pixelColor.z()));
-            std::cout << "Pixel Number: " << pixelList.size() << std::endl;
+            pixelList[j * scene.camera.imgWidth + i] = pixel(pixelColor.x(), pixelColor.y(), pixelColor.z());
         }
     }
+}
+
+std::vector<pixel> Raytracer::startRaytrace() {
+    std::vector<pixel> pixelList(scene.camera.imgWidth * scene.camera.imgHeight);
+    std::vector<std::thread> threads;
+    int chunkSize = scene.camera.imgHeight / NUM_THREADS;
+
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        int startY = i * chunkSize;
+        int endY = (i == NUM_THREADS - 1) ? scene.camera.imgHeight : startY + chunkSize;
+        threads.emplace_back(&Raytracer::traceChunk, this, startY, endY, std::ref(pixelList));
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
     std::clog << "\rDone.                 \n";
     return pixelList;
 }

@@ -34,15 +34,19 @@ void exportImage(std::string fileName, const std::vector<pixel> &pixel_values, i
 }
 
 int main(int argc, char* argv[]) {
+    auto start = std::chrono::high_resolution_clock::now(); // Start timer
     //pass properties to RayTracer
     std::string fileName = "output.ppm";
     if (argc > 1) {
         fileName = argv[1];
     }
     fileName = "../output/" + fileName;
-    Raytracer raytracer = Raytracer(100, 100);
+    Raytracer raytracer = Raytracer(10000, 10000);
     //get the image, currently just a blue gradient
     std::vector<pixel> image = raytracer.startRaytrace();
     exportImage(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
+    auto end = std::chrono::high_resolution_clock::now(); // End timer
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Time taken: " << duration.count() << " seconds" << std::endl;
     return 1;
 }

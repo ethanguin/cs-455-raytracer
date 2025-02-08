@@ -2,6 +2,7 @@
 #define RAYTRACER_H
 #include <vector>
 #include <random>
+#include <thread>
 #include "pixel.h"
 #include "Scene.h"
 #include "Ray.h"
@@ -9,6 +10,7 @@
 
 class Raytracer {
     private:
+        const int NUM_THREADS = 8;
         float viewportHeight;
         float viewportWidth;
         Vect3<float> viewportU;
@@ -33,6 +35,7 @@ class Raytracer {
         }
         void initialize();
         std::vector<pixel> startRaytrace();
+        void traceChunk(int startY, int endY, std::vector<pixel>& pixelList);
         Color traceRay(const Ray &r);
         
 };
