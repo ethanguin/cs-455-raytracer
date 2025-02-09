@@ -43,8 +43,8 @@ std::vector<pixel> Raytracer::startRaytrace() {
 }
 
 Color Raytracer::traceRay(const Ray &r) {
-    for (const auto& sphere : scene.objects) {
-        if (sphere.isHit(r)) {
+    for (const auto& object : scene.objects) {
+        if (object->isHit(r)) {
             return Color(255, 0, 0);
         }
     }

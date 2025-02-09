@@ -6,6 +6,7 @@
 #include "pixel.h"
 #include "Scene.h"
 #include "Ray.h"
+#include "loadbar.h"
 #include "Vect3.h"
 
 class Raytracer {

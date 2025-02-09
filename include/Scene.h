@@ -2,7 +2,7 @@
 #define SCENE_H
 #include "Vect3.h"
 #include "Ray.h"
-#include <list>
+#include <vector>
 
 class Object_3D {
     public:
@@ -21,11 +21,14 @@ class Object_3D {
             rot = Vect3<float>(rotx, roty, rotz);
         }
         void move(float x, float y, float z);
-        virtual bool isHit(const Ray &r) const;
+        virtual bool isHit(const Ray &r) const {
+            return false;
+        }
+        ~Object_3D() = default;
 };
 
 class Polygon : public Object_3D {
-    std::list<Vect3<int> > verts;
+    std::vector<Vect3<int> > verts;
 };
 
 class Sphere : public Object_3D {
@@ -77,13 +80,11 @@ class Light_Directional : public Light {
 
 class Scene {
     public:
-        std::list<Object_3D> objects;
+        std::vector<Object_3D*> objects;
         Camera camera;
-        std::list<Light> lights;
+        std::vector<Light*> lights;
         Scene(){}
-        void addSphere(float posx, float posy, float posz, float radius) {
-            objects.push_back(Sphere(posx, posy, posz, radius));
-        }
+        void addSphere(float posx, float posy, float posz, float radius);
 };
 
 #endif

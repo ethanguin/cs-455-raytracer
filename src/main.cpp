@@ -50,9 +50,9 @@ int main(int argc, char* argv[]) {
     }
     fileName = "../output/" + fileName;
     Scene scene = Scene();
-    scene.addSphere(0, 0, -1, 0.5);
-    scene.camera.imgWidth = 640;
-    scene.camera.imgHeight = 480;
+    scene.addSphere(0, 0, -1, .5);
+    scene.camera.imgWidth = 1920;
+    scene.camera.imgHeight = 1080;
     Raytracer raytracer = Raytracer(scene);
     std::vector<pixel> image = raytracer.startRaytrace();
     auto endRay = std::chrono::high_resolution_clock::now(); // End timer
