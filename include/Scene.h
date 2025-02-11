@@ -21,8 +21,11 @@ class Object_3D {
             rot = Vect3<float>(rotx, roty, rotz);
         }
         void move(float x, float y, float z);
-        virtual bool isHit(const Ray &r) const {
-            return false;
+        virtual float isHit(const Ray &r) const {
+            return -1;
+        }
+        virtual Normal getNormal(Point3 ) const {
+            return Normal(0, 0, 0);
         }
         ~Object_3D() = default;
 };
@@ -41,7 +44,8 @@ class Sphere : public Object_3D {
             pos = Vect3<float>(posx, posy, posz);
             radius = radius_input;
         }
-        bool isHit(const Ray &r) const override;
+        float isHit(const Ray &r) const override;
+        Normal getNormal(Point3 p) const override;
 };
 
 class Camera : public Object_3D {
@@ -54,6 +58,13 @@ class Camera : public Object_3D {
         Camera() {
             imgWidth = 1920;
             imgHeight = 1080;
+            aspectRatio = (double)imgWidth / (double)imgHeight;
+            fov = 90.0;
+            focalLength = 1.0;
+        }
+        Camera(int width, int height) {
+            imgWidth = width;
+            imgHeight = height;
             aspectRatio = (double)imgWidth / (double)imgHeight;
             fov = 90.0;
             focalLength = 1.0;
@@ -85,6 +96,9 @@ class Scene {
         std::vector<Light*> lights;
         Scene(){}
         void addSphere(float posx, float posy, float posz, float radius);
+        void setCamera(Camera new_camera) {
+            camera = new_camera;
+        }
 };
 
 #endif

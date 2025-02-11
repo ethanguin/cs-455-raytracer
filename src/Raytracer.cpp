@@ -44,8 +44,12 @@ std::vector<pixel> Raytracer::startRaytrace() {
 
 Color Raytracer::traceRay(const Ray &r) {
     for (const auto& object : scene.objects) {
-        if (object->isHit(r)) {
-            return Color(255, 0, 0);
+        auto currT = object->isHit(r);
+        if (currT != -1) {
+            //return Color(255, 0, 0);
+            //return the normal at the current intersection point
+            Normal N = object->getNormal(r.at(currT)).normal();
+            return toInt(0.5*Normal(N.x()+1, N.y()+1, N.z()+1));
         }
     }
     Vect3<float> normDir = r.direction().normal();

@@ -4,13 +4,29 @@ void Object_3D::move(float x, float y, float z) {
     pos += Vect3<float>(x, y, z);
 }
 
-bool Sphere::isHit(const Ray &r) const {
-    Vect3<float> oc = pos - r.origin();
-    auto a = dot(r.direction(), r.direction());
-    auto b = -2.0 * dot(r.direction(), oc);
-    auto c = dot(oc, oc) - radius*radius;
-    auto discriminant = b*b - 4*a*c;
-    return (discriminant >= 0);
+//returns the point distance along the ray where the ray hits the sphere
+float Sphere::isHit(const Ray &r) const {
+    auto oc = pos - r.origin();
+    //if the ray is inside the sphere, just don't render it for now
+    // if (oc.length() < radius) {
+    //     return -1;
+    // }
+    //if the ray is pointing away from the sphere, don't render it
+    auto tca = dot(r.direction(), oc);
+    if (tca < 0) {
+        return -1;
+    }
+    auto tch2 = radius*radius - dot(oc, oc) + tca*tca;
+    //if the ray misses the sphere, don't render it
+    if (tch2 < 0) {
+        return -1;
+    }
+    auto t = tca - sqrt(tch2);
+    return t;
+}
+
+Normal Sphere::getNormal(Point3 p) const {
+    return ((p - pos)/radius).normal();
 }
 
 void Scene::addSphere(float posx, float posy, float posz, float radius) {
