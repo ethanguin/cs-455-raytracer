@@ -1,20 +1,18 @@
 #include "Material.h"
 
-Color Material::getLighting(Normal &N, const Color &LightColor, const Point3 &LightDir, const Point3 &ViewVector) {
+Color Material::getLighting(Normal &N, const Color &LightColor, const Point3 &LightDir, const Vect3<float> &RayDir) {
     float m_ambient = 0.1;
     auto lightDir = LightDir.normal();
     Color ambient = ambientColor * m_ambient * baseColor;
-    auto viewDir = -ViewVector.normal();
+    auto viewDir = -RayDir.normal();
 
     auto I_d = kd*baseColor*(dot(N, lightDir));
 
-    auto R = 2*(dot(lightDir, N))*N - lightDir;
-    auto I_s = ks*specColor*std::pow((dot(viewDir, R)),kgls);
+    auto R = (N * (2.0 * dot(N, lightDir))) - lightDir;
+    auto I_s = ks*specColor*LightColor*std::pow(std::max(0.0f,(dot(viewDir, R))),kgls);
 
     //Clip the values
     auto light_total = I_d + I_s + ambient;
-    light_total = clip(light_total, 0, 255);
-    light_total = light_total + ambient;
     light_total = clip(light_total, 0, 255);
     return light_total;
 }

@@ -50,7 +50,7 @@ Color Raytracer::traceRay(const Ray &r) {
             // //return the normal at the current intersection point
             Normal N = object->getNormal(r.at(currT)).normal();
             //return toColor(0.5*Normal(N.x()+1, N.y()+1, N.z()+1));
-            Color matColor = object->mat.getLighting(N, scene.lights[0]->color, scene.lights[0]->dir, scene.camera.dir);
+            Color matColor = object->mat.getLighting(N, scene.lights[0]->color, scene.lights[0]->dir, r.direction());
             return matColor;
         }
     }

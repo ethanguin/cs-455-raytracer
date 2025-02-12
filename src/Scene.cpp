@@ -30,7 +30,7 @@ float Sphere::isHit(const Ray &r) const {
 }
 
 Normal Sphere::getNormal(Point3 p) const {
-    return ((p - pos)/radius).normal();
+    return (p - pos).normal();
 }
 
 void Scene::addSphere(float posx, float posy, float posz, float radius) {

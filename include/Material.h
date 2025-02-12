@@ -16,7 +16,7 @@ public:
     float ka = 0.1;
     Material() {}
     Material(Color baseColor) : baseColor(baseColor) {}
-    Color getLighting(Normal &N, const Color &LightColor, const Point3 &LightDir, const Point3 &ViewVector);
+    Color getLighting(Normal &N, const Color &LightColor, const Point3 &LightDir, const Vect3<float> &RayDir);
     void setBaseColor(Color new_color);
     void setSpecColor(Color new_color);
     Color clip(Color nVect, float lower, float upper);
