@@ -94,10 +94,9 @@ class Light_Directional : public Light {
         Light_Directional() {
             dir = Vect3<float>(-1, -1, -.1).normal();
         }
-        Light_Directional(float posx, float posy, float posz, float dirx, float diry, float dirz) {
+        Light_Directional(float dirx, float diry, float dirz) {
             dir = Vect3<float>(dirx, diry, dirz);
             dir = dir.normal();
-            pos = Vect3<float>(posx, posy, posz);
         }
 };
 

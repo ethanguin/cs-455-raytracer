@@ -11,7 +11,7 @@
 
 class Raytracer {
     private:
-        const int NUM_THREADS = 8;
+        const int NUM_THREADS = 16;
         float viewportHeight;
         float viewportWidth;
         Vect3<float> viewportU;

@@ -1,7 +1,7 @@
 #include "Raytracer.h"
 
 void Raytracer::initialize() {
-    viewportHeight = .5;
+    viewportHeight = 1.12;
     viewportWidth = scene.camera.aspectRatio * viewportHeight;
     viewportU = Vect3<float>(viewportWidth, 0, 0);
     viewportV = Vect3<float>(0, -viewportHeight, 0);
