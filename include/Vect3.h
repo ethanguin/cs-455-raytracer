@@ -57,7 +57,7 @@ class Vect3 {
         friend std::ostream& operator<<(std::ostream& out, const Vect3<U>& e);
 };
 using Point3 = Vect3<float>;
-using Color = Vect3<int>;
+using Color = Vect3<float>;
 using Normal = Vect3<float>;
 
 template <typename T>
@@ -96,8 +96,12 @@ inline float dot(const Vect3<T>& u, const Vect3<U>& e) {
          + u.v[2] * e.v[2];
 }
 template <typename T>
+inline Color toColor(const Vect3<T>& u) {
+    return Color((u.v[0]*255.999), (u.v[1]*255.999), (u.v[2]*255.999));
+}
+template <typename T>
 inline Vect3<int> toInt(const Vect3<T>& u) {
-    return Vect3<int>(int(u.v[0]*255.999), int(u.v[1]*255.999), int(u.v[2]*255.999));
+    return Vect3<int>(int(u.v[0]), int(u.v[1]), int(u.v[2]));
 }
 template <typename T, typename U>
 inline Vect3<T> cross(const Vect3<T>& u, const Vect3<U>& e) {

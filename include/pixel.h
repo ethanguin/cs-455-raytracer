@@ -16,12 +16,12 @@ struct pixel {
     int G() const { return RGB[1]; }
     int B() const { return RGB[2]; }
     std::string toString () {
-        return std::to_string(R()) + " " + std::to_string(G()) + " " + std::to_string(B()) + "\n";
+        return std::to_string(static_cast<int>(R())) + " " + std::to_string(static_cast<int>(G())) + " " + std::to_string(static_cast<int>(B())) + "\n";
     }
 };
 
 inline std::ostream & operator<<(std::ostream& os, const pixel& v) { 
-  os << std::to_string(v.R()) << " " << std::to_string(v.G()) << " " << std::to_string(v.B()) << "\n";
+  os << std::to_string(static_cast<int>(v.R())) << " " << std::to_string(static_cast<int>(v.G())) << " " << std::to_string(static_cast<int>(v.B())) << "\n";
   return os;
 }
 

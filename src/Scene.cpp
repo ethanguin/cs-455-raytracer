@@ -1,7 +1,11 @@
 #include "Scene.h"
 
+void Scene::setBackgroundColor(Color new_color) {
+        backgroundColor = new_color;
+}
+
 void Object_3D::move(float x, float y, float z) {
-    pos += Vect3<float>(x, y, z);
+    pos = Vect3<float>(x, y, z);
 }
 
 //returns the point distance along the ray where the ray hits the sphere

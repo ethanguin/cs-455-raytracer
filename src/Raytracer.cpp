@@ -1,7 +1,7 @@
 #include "Raytracer.h"
 
 void Raytracer::initialize() {
-    viewportHeight = 2.0;
+    viewportHeight = .5;
     viewportWidth = scene.camera.aspectRatio * viewportHeight;
     viewportU = Vect3<float>(viewportWidth, 0, 0);
     viewportV = Vect3<float>(0, -viewportHeight, 0);
@@ -47,16 +47,12 @@ Color Raytracer::traceRay(const Ray &r) {
         auto currT = object->isHit(r);
         if (currT != -1) {
             //return Color(255, 0, 0);
-            //return the normal at the current intersection point
+            // //return the normal at the current intersection point
             Normal N = object->getNormal(r.at(currT)).normal();
-            return toInt(0.5*Normal(N.x()+1, N.y()+1, N.z()+1));
+            //return toColor(0.5*Normal(N.x()+1, N.y()+1, N.z()+1));
+            Color matColor = object->mat.getLighting(N, scene.lights[0]->color, scene.lights[0]->dir, scene.camera.dir);
+            return matColor;
         }
     }
-    Vect3<float> normDir = r.direction().normal();
-    float a = .5*(normDir.y() + 1.0);
-    //std::cout << "normDir.y(): " << normDir.y() << ", a: " << a << std::endl;
-    Vect3<float> white = Vect3<float>(255, 255, 255) * (1 - a);
-    Vect3<float> blue = Vect3<float>(127, 178, 255) * a;
-    Vect3<float> combined = white + blue;
-    return Color(static_cast<int>(combined.x()), static_cast<int>(combined.y()), static_cast<int>(combined.z()));
+    return toColor(scene.backgroundColor);
 }

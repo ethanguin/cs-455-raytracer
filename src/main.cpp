@@ -50,8 +50,17 @@ int main(int argc, char* argv[]) {
     }
     fileName = "../output/" + fileName;
     Scene scene = Scene();
-    scene.addSphere(0, 0, -1, .5);
-    Camera camera = Camera(100, 100);
+    scene.setBackgroundColor(Color(.2, .2, .2));
+    //scene.addSphere(0, 0, -1, .5);
+    Object_3D *sphere = new Sphere(0, 0, -1, .4);
+    sphere->mat.setBaseColor(Color(255, 0, 255));
+    sphere->mat.setSpecColor(Color(255, 255, 255));
+    Light_Directional *light = new Light_Directional(0, 0, 0, 0, 1, 0);
+    scene.addLight(light);
+    scene.addObject(sphere);
+    Camera camera = Camera(1000, 1000);
+    camera.move(0, 0, 1);
+    camera.lookAt(Point3(0, 0, 0));
     scene.setCamera(camera);
     Raytracer raytracer = Raytracer(scene);
     std::vector<pixel> image = raytracer.startRaytrace();
