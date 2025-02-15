@@ -18,10 +18,10 @@ bool is_file_exist(std::string fileName) {
 void exportImage(std::string fileName, const std::vector<pixel> &pixel_values, int width, int height) {
     int num = 0;
     std::string fileBase = fileName.substr(0, fileName.find_last_of(".")); //remove extension
-    while (is_file_exist(fileName)) {
-        num++;
-        fileName = fileBase + "_" + std::to_string(num) + ".ppm";
-    }
+    // while (is_file_exist(fileName)) {
+    //     num++;
+    //     fileName = fileBase + "_" + std::to_string(num) + ".ppm";
+    // }
     std::ofstream fileOut(fileName);
     if (!fileOut) {
         std::cerr << "Error: Could not open output.ppm for writing." << std::endl;
@@ -132,5 +132,83 @@ int main(int argc, char* argv[]) {
     std::chrono::duration<double> durationRay2 = endRay2 - start;
     std::cout << "Raytracing Done at: " << durationRay2.count() << " seconds" << std::endl;
     exportImage(fileName, image2, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
+
+
+    // My own test case
+    Scene scene3 = Scene();
+    scene3.setCamera(camera);
+    scene3.camera.move(0, 0, 1.5);
+    scene3.setBackgroundColor(Color(0, .66, 1));
+    scene3.addLight(new Light_Directional(-.5, .5, 1));
+    ambColor = Color(.2, .2, 0);
+    
+    //SUN
+    Sphere *bigSphere = new Sphere(450, 450, -1000, 300);
+    bigSphere->mat.ambientColor = Color(5, 5, 0);
+    bigSphere->mat.setBaseColor(Color(255, 255, 0));
+    bigSphere->mat.kd = .5;
+    bigSphere->mat.ks = .4;
+    bigSphere->mat.ka = .1;
+    scene3.addObject(bigSphere);
+
+    // Sphere *tinySphere = new Sphere(-1, 0, 0, .1);
+    // tinySphere->mat.ambientColor = ambColor;
+    // scene3.addObject(tinySphere);
+
+    //---------Grass--------------------//
+    Point3 pos = Point3(0, -2.2, -.5);
+    float rad = 2;
+    Sphere *grass = new Sphere(pos.x(), pos.y(), pos.z(), rad);
+    grass->mat.ambientColor = ambColor;
+    grass->mat.kd = .8;
+    grass->mat.ks = .2;
+    grass->mat.ka = 0;
+    grass->mat.setBaseColor(Color(0, 255, 0));
+    grass->mat.setSpecColor(Color(255, 255, 255));
+    grass->mat.kgls = 2.0;
+    scene3.addObject(grass);
+    //----------------------------------//
+
+    //---------Blue Sphere--------------------//
+    float rad2 = .2;
+    Sphere *blue = new Sphere(pos.x(), pos.y()+rad+rad2, pos.z(), rad2);
+    blue->mat.ambientColor = ambColor;
+    blue->mat.kd = .5;
+    blue->mat.ks = .4;
+    blue->mat.ka = .1;
+    blue->mat.setBaseColor(Color(0, 100, 255));
+    blue->mat.setSpecColor(Color(255, 255, 255));
+    blue->mat.kgls = 18.0;
+    scene3.addObject(blue);
+    //----------------------------------//
+    //---------Red Sphere--------------------//
+    Sphere *red = new Sphere(-rad2*1.45, pos.y()+rad+rad2/1.8, pos.z(), rad2/2);
+    red->mat.ambientColor = ambColor;
+    red->mat.kd = .5;
+    red->mat.ks = .4;
+    red->mat.ka = .1;
+    red->mat.setBaseColor(Color(255, 0, 0));
+    red->mat.setSpecColor(Color(255, 255, 255));
+    red->mat.kgls = 50.0;
+    scene3.addObject(red);
+    //----------------------------------//
+    //---------Black Sphere--------------------//
+    Sphere *black = new Sphere(rad2*1.45, pos.y()+rad+rad2/1.8, pos.z(), rad2/2);
+    black->mat.ambientColor = ambColor;
+    black->mat.kd = .1;
+    black->mat.ks = .8;
+    black->mat.ka = .1;
+    black->mat.setBaseColor(Color(10, 10, 10));
+    black->mat.setSpecColor(Color(255, 255, 255));
+    black->mat.kgls = 15.0;
+    scene3.addObject(black);
+    //----------------------------------//
+
+    file2 = "EthanBishop_Raytracing-Test3.ppm";
+    fileName = "../output/" + file2;
+    Raytracer raytracer3 = Raytracer(scene3);
+    std::vector<pixel> image3 = raytracer3.startRaytrace();
+    exportImage(fileName, image3, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight);
+
     return 1;
 }
