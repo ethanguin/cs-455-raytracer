@@ -12,6 +12,7 @@
 class Raytracer {
     private:
         const int NUM_THREADS = 16;
+        const int MAX_DEPTH = 3;
         float viewportHeight;
         float viewportWidth;
         Vect3<float> viewportU;
@@ -37,8 +38,8 @@ class Raytracer {
         void initialize();
         std::vector<pixel> startRaytrace();
         void traceChunk(int startY, int endY, std::vector<pixel>& pixelList);
-        Color traceRay(const Ray &r);
-        
+        Color traceRay(const Ray &r, int depth);
+        bool shadowRay(const Ray &r, const Object_3D *selfObj);
 };
 
 #endif

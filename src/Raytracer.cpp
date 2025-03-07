@@ -19,7 +19,7 @@ void Raytracer::traceChunk(int startY, int endY, std::vector<pixel>& pixelList) 
             auto pixelCenter = pixel00Pos + static_cast<float>(i) * dU + static_cast<float>(j) * dV;
             auto rayDir = pixelCenter - scene.camera.pos;
             Ray r = Ray(scene.camera.pos, rayDir);
-            Color pixelColor = traceRay(r);
+            Color pixelColor = traceRay(r, MAX_DEPTH);
             pixelList[j * scene.camera.imgWidth + i] = pixel(pixelColor.x(), pixelColor.y(), pixelColor.z());
         }
     }
@@ -42,17 +42,40 @@ std::vector<pixel> Raytracer::startRaytrace() {
     return pixelList;
 }
 
-Color Raytracer::traceRay(const Ray &r) {
+Color Raytracer::traceRay(const Ray &r, int depth) {
     for (const auto& object : scene.objects) {
         auto currT = object->isHit(r);
         if (currT != -1) {
+            auto DirLight = scene.lights[0];
+            // send out shadow ray
+            bool inShadow = shadowRay(Ray(r.at(currT), DirLight->dir), object);
+            if (inShadow) {
+                // TOFIX add real color, this is just for debugging
+                // return Color(255, 0, 0);
+                return object->mat.ambientColor;
+            }
             //return Color(255, 0, 0);
             // //return the normal at the current intersection point
             Normal N = object->getNormal(r.at(currT)).normal();
             //return toColor(0.5*Normal(N.x()+1, N.y()+1, N.z()+1));
-            Color matColor = object->mat.getLighting(N, scene.lights[0]->color, scene.lights[0]->dir, r.direction());
+            Color matColor = object->mat.getLighting(N, DirLight->color, DirLight->dir, r.direction());
             return matColor;
         }
     }
     return toColor(scene.backgroundColor);
+}
+
+bool Raytracer::shadowRay(const Ray &r, const Object_3D *selfObj) {
+    for (const auto& object : scene.objects) {
+        auto currT = object->isHit(r);
+        // check doesn't work. It just gets rid of shadows entirely, soooo not sure what's up with that
+        // I'm intending for it to exclude itself so it only checks shadows for other objects
+        // if (object == selfObj) {
+        //     return false;
+        // }
+        if (currT != -1) {
+            return true;
+        }
+    }
+    return false;
 }
