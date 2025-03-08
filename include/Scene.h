@@ -2,6 +2,7 @@
 #define SCENE_H
 #include "Vect3.h"
 #include "Ray.h"
+#include "Matrix4.h"
 #include "Material.h"
 #include <vector>
 
@@ -20,18 +21,18 @@ class Object_3D {
             pos = Vect3<float>(posx, posy, posz);
             rot = Vect3<float>(rotx, roty, rotz);
         }
-        void move(float x, float y, float z);
+        virtual void move(float x, float y, float z);
         virtual float isHit(const Ray &r) const {
             return -1;
         }
         virtual Normal getNormal(Point3 ) const {
             return Normal(0, 0, 0);
         }
+        virtual void transform (const Matrix4& mat) {
+            pos = mat.transform(pos);
+            rot = mat.transform(rot);
+        }
         ~Object_3D() = default;
-};
-
-class Polygon : public Object_3D {
-    std::vector<Vect3<int> > verts;
 };
 
 class Sphere : public Object_3D {
@@ -118,6 +119,11 @@ class Scene {
         }
         void addObject(Object_3D* obj) {
             objects.push_back(obj);
+        }
+        void addObjectList(std::vector<Object_3D*> objs) {
+            for (int i = 0; i < objs.size(); i++) {
+                objects.push_back(objs[i]);
+            }
         }
         void setBackgroundColor(Color new_color);
 };

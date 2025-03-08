@@ -11,7 +11,7 @@
 
 class Raytracer {
     private:
-        const int NUM_THREADS = 16;
+        const int NUM_THREADS = 2;
         const int MAX_DEPTH = 3;
         float viewportHeight;
         float viewportWidth;

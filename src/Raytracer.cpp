@@ -43,39 +43,52 @@ std::vector<pixel> Raytracer::startRaytrace() {
 }
 
 Color Raytracer::traceRay(const Ray &r, int depth) {
+    float closestT = std::numeric_limits<float>::max();
+    Object_3D* closestObj = nullptr;
     for (const auto& object : scene.objects) {
         auto currT = object->isHit(r);
-        if (currT != -1) {
-            auto DirLight = scene.lights[0];
-            // send out shadow ray
-            bool inShadow = shadowRay(Ray(r.at(currT), DirLight->dir), object);
-            if (inShadow) {
-                // TOFIX add real color, this is just for debugging
-                // return Color(255, 0, 0);
-                return object->mat.ambientColor;
-            }
-            //return Color(255, 0, 0);
-            // //return the normal at the current intersection point
-            Normal N = object->getNormal(r.at(currT)).normal();
-            //return toColor(0.5*Normal(N.x()+1, N.y()+1, N.z()+1));
-            Color matColor = object->mat.getLighting(N, DirLight->color, DirLight->dir, r.direction());
-            return matColor;
+        if (currT != -1 && currT < closestT) {
+            closestT = currT;
+            closestObj = object;
         }
     }
-    return toColor(scene.backgroundColor);
+    if (closestObj == nullptr) {
+        return toColor(scene.backgroundColor);
+    }
+    auto DirLight = scene.lights[0];
+    // send out shadow ray
+    Color baseColor;
+    Normal N = closestObj->getNormal(r.at(closestT)).normal();
+    bool inShadow = shadowRay(Ray(r.at(closestT), DirLight->dir), closestObj);
+    if (inShadow) {
+        // TOFIX add real color, this is just for debugging
+        // return Color(255, 0, 0);
+        baseColor = closestObj->mat.ambientColor;
+    } else {
+        baseColor = closestObj->mat.getLighting(N, DirLight->color, DirLight->dir, r.direction());
+    }
+    // return the normal at the current intersection point
+    Color matColor = baseColor;
+    // send out reflection ray and add it to the base color
+    if (depth > 0) {
+        float specularLevel = closestObj->mat.ks;
+        auto reflectionDir = (r.direction() - 2 * dot(r.direction(), N) * N).normal();
+        Ray reflectionRay = Ray(r.at(closestT) + reflectionDir * 0.01, reflectionDir);
+        Color reflectionColor = traceRay(reflectionRay, depth - 1);
+        matColor = (reflectionColor * specularLevel) + (baseColor * (1 - specularLevel));
+    }
+    return matColor;
 }
 
 bool Raytracer::shadowRay(const Ray &r, const Object_3D *selfObj) {
     for (const auto& object : scene.objects) {
+        if (object == selfObj) {
+            continue; // Skip the object itself
+        }
         auto currT = object->isHit(r);
-        // check doesn't work. It just gets rid of shadows entirely, soooo not sure what's up with that
-        // I'm intending for it to exclude itself so it only checks shadows for other objects
-        // if (object == selfObj) {
-        //     return false;
-        // }
         if (currT != -1) {
-            return true;
+            return true; // In shadow
         }
     }
-    return false;
+    return false; // Not in shadow
 }
