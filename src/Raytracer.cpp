@@ -1,7 +1,7 @@
 #include "Raytracer.h"
 
 void Raytracer::initialize() {
-    viewportHeight = 2.0;
+    viewportHeight = 1.12;
     viewportWidth = scene.camera.aspectRatio * viewportHeight;
     viewportU = Vect3<float>(viewportWidth, 0, 0);
     viewportV = Vect3<float>(0, -viewportHeight, 0);
@@ -19,7 +19,7 @@ void Raytracer::traceChunk(int startY, int endY, std::vector<pixel>& pixelList) 
             auto pixelCenter = pixel00Pos + static_cast<float>(i) * dU + static_cast<float>(j) * dV;
             auto rayDir = pixelCenter - scene.camera.pos;
             Ray r = Ray(scene.camera.pos, rayDir);
-            Color pixelColor = traceRay(r);
+            Color pixelColor = traceRay(r, MAX_DEPTH);
             pixelList[j * scene.camera.imgWidth + i] = pixel(pixelColor.x(), pixelColor.y(), pixelColor.z());
         }
     }
@@ -42,17 +42,53 @@ std::vector<pixel> Raytracer::startRaytrace() {
     return pixelList;
 }
 
-Color Raytracer::traceRay(const Ray &r) {
+Color Raytracer::traceRay(const Ray &r, int depth) {
+    float closestT = std::numeric_limits<float>::max();
+    Object_3D* closestObj = nullptr;
     for (const auto& object : scene.objects) {
-        if (object->isHit(r)) {
-            return Color(255, 0, 0);
+        auto currT = object->isHit(r);
+        if (currT != -1 && currT < closestT) {
+            closestT = currT;
+            closestObj = object;
         }
     }
-    Vect3<float> normDir = r.direction().normal();
-    float a = .5*(normDir.y() + 1.0);
-    //std::cout << "normDir.y(): " << normDir.y() << ", a: " << a << std::endl;
-    Vect3<float> white = Vect3<float>(255, 255, 255) * (1 - a);
-    Vect3<float> blue = Vect3<float>(127, 178, 255) * a;
-    Vect3<float> combined = white + blue;
-    return Color(static_cast<int>(combined.x()), static_cast<int>(combined.y()), static_cast<int>(combined.z()));
+    if (closestObj == nullptr) {
+        return toColor(scene.backgroundColor);
+    }
+    auto DirLight = scene.lights[0];
+    // send out shadow ray
+    Color baseColor;
+    Normal N = closestObj->getNormal(r.at(closestT)).normal();
+    bool inShadow = shadowRay(Ray(r.at(closestT), DirLight->dir), closestObj);
+    if (inShadow) {
+        // TOFIX add real color, this is just for debugging
+        // return Color(255, 0, 0);
+        baseColor = closestObj->mat.ambientColor;
+    } else {
+        baseColor = closestObj->mat.getLighting(N, DirLight->color, DirLight->dir, r.direction());
+    }
+    // return the normal at the current intersection point
+    Color matColor = baseColor;
+    // send out reflection ray and add it to the base color
+    if (depth > 0) {
+        float specularLevel = closestObj->mat.ks;
+        auto reflectionDir = (r.direction() - 2 * dot(r.direction(), N) * N).normal();
+        Ray reflectionRay = Ray(r.at(closestT) + reflectionDir * 0.01, reflectionDir);
+        Color reflectionColor = traceRay(reflectionRay, depth - 1);
+        matColor = (reflectionColor * specularLevel) + (baseColor * (1 - specularLevel));
+    }
+    return matColor;
+}
+
+bool Raytracer::shadowRay(const Ray &r, const Object_3D *selfObj) {
+    for (const auto& object : scene.objects) {
+        if (object == selfObj) {
+            continue; // Skip the object itself
+        }
+        auto currT = object->isHit(r);
+        if (currT != -1) {
+            return true; // In shadow
+        }
+    }
+    return false; // Not in shadow
 }

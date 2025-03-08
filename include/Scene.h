@@ -2,16 +2,17 @@
 #define SCENE_H
 #include "Vect3.h"
 #include "Ray.h"
+#include "Matrix4.h"
+#include "Material.h"
 #include <vector>
 
 class Object_3D {
     public:
-        Vect3<float> pos;
-        Vect3<float> rot;
-        Object_3D() {
-            pos = Vect3<float>(0, 0, 0);
-            rot = Vect3<float>(0, 0, 0);
-        }
+        Vect3<float> pos = Vect3<float>(0, 0, 0);
+        Vect3<float> rot = Vect3<float>(90, 0, 0);
+        Vect3<float> dir = Vect3<float>(0, 0, -1);
+        Material mat = Material();
+        Object_3D() {}
         Object_3D(Vect3<float> pos_input, Vect3<float> rot_input) {
             pos = pos_input;
             rot = rot_input;
@@ -20,15 +21,18 @@ class Object_3D {
             pos = Vect3<float>(posx, posy, posz);
             rot = Vect3<float>(rotx, roty, rotz);
         }
-        void move(float x, float y, float z);
-        virtual bool isHit(const Ray &r) const {
-            return false;
+        virtual void move(float x, float y, float z);
+        virtual float isHit(const Ray &r) const {
+            return -1;
+        }
+        virtual Normal getNormal(Point3 ) const {
+            return Normal(0, 0, 0);
+        }
+        virtual void transform (const Matrix4& mat) {
+            pos = mat.transform(pos);
+            rot = mat.transform(rot);
         }
         ~Object_3D() = default;
-};
-
-class Polygon : public Object_3D {
-    std::vector<Vect3<int> > verts;
 };
 
 class Sphere : public Object_3D {
@@ -41,7 +45,8 @@ class Sphere : public Object_3D {
             pos = Vect3<float>(posx, posy, posz);
             radius = radius_input;
         }
-        bool isHit(const Ray &r) const override;
+        float isHit(const Ray &r) const override;
+        Normal getNormal(Point3 p) const override;
 };
 
 class Camera : public Object_3D {
@@ -57,6 +62,18 @@ class Camera : public Object_3D {
             aspectRatio = (double)imgWidth / (double)imgHeight;
             fov = 90.0;
             focalLength = 1.0;
+            rot = Vect3<float>(0, 0, -1);
+        }
+        Camera(int width, int height) {
+            imgWidth = width;
+            imgHeight = height;
+            aspectRatio = (double)imgWidth / (double)imgHeight;
+            fov = 90.0;
+            focalLength = 1.0;
+            rot = Vect3<float>(0, 0, -1);
+        }
+        void lookAt(Point3 target) {
+            dir = (target - pos).normal();
         }
 };
 
@@ -64,27 +81,51 @@ class Light : public Object_3D {
     public:
         Color color;
         int intensity;
-        Light() {}
+        Vect3<float> dir = Vect3<float>(0, 0, 0);
+        Light() {
+            color = Color(1, 1, 1);
+            intensity = 1;
+        }
+        void setColor(Color new_color) {
+            color = new_color;
+        }
 };
 class Light_Directional : public Light {
-    Vect3<float> dir;
-    Light_Directional() {
-        dir = Vect3<float>(-1, 0, 0);
-    }
-    Light_Directional(float posx, float posy, float posz, float dirx, float diry, float dirz) {
-        dir = Vect3<float>(dirx, diry, dirz);
-        dir = dir.normal();
-        pos = Vect3<float>(posx, posy, posz);
-    }
+    public:
+        Light_Directional() {
+            dir = Vect3<float>(-1, -1, -.1).normal();
+        }
+        Light_Directional(float dirx, float diry, float dirz) {
+            dir = Vect3<float>(dirx, diry, dirz);
+            dir = dir.normal();
+        }
 };
 
 class Scene {
-    public:
+    friend class Raytracer;
+    private:
         std::vector<Object_3D*> objects;
-        Camera camera;
         std::vector<Light*> lights;
+        Color backgroundColor = Color(0, 0, 0);
+    public:
+        Camera camera;
         Scene(){}
         void addSphere(float posx, float posy, float posz, float radius);
+        void addLight(Light* light) {
+            lights.push_back(light);
+        }
+        void setCamera(Camera new_camera) {
+            camera = new_camera;
+        }
+        void addObject(Object_3D* obj) {
+            objects.push_back(obj);
+        }
+        void addObjectList(std::vector<Object_3D*> objs) {
+            for (int i = 0; i < objs.size(); i++) {
+                objects.push_back(objs[i]);
+            }
+        }
+        void setBackgroundColor(Color new_color);
 };
 
 #endif

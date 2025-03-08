@@ -19,9 +19,9 @@ class Vect3 {
             float len = this->length();
             return Vect3<float>(float(v[0]) / len, float(v[1]) / len, float(v[2]) / len);
         }
-        T x() { return v[0]; }
-        T y() { return v[1]; }
-        T z() { return v[2]; }
+        T x() const { return v[0]; }
+        T y() const { return v[1]; }
+        T z() const { return v[2]; }
         Vect3 operator-() const { return Vect3(-v[0], -v[1], -v[2]); }
         T operator[](int i) const { return v[i]; }
         T& operator[](int i) { return v[i]; }
@@ -57,7 +57,8 @@ class Vect3 {
         friend std::ostream& operator<<(std::ostream& out, const Vect3<U>& e);
 };
 using Point3 = Vect3<float>;
-using Color = Vect3<int>;
+using Color = Vect3<float>;
+using Normal = Vect3<float>;
 
 template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const Vect3<T>& e) {
@@ -93,6 +94,14 @@ inline float dot(const Vect3<T>& u, const Vect3<U>& e) {
     return u.v[0] * e.v[0]
          + u.v[1] * e.v[1]
          + u.v[2] * e.v[2];
+}
+template <typename T>
+inline Color toColor(const Vect3<T>& u) {
+    return Color((u.v[0]*255.999), (u.v[1]*255.999), (u.v[2]*255.999));
+}
+template <typename T>
+inline Vect3<int> toInt(const Vect3<T>& u) {
+    return Vect3<int>(int(u.v[0]), int(u.v[1]), int(u.v[2]));
 }
 template <typename T, typename U>
 inline Vect3<T> cross(const Vect3<T>& u, const Vect3<U>& e) {

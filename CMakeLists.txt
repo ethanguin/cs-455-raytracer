@@ -1,7 +1,0 @@
-cmake_minimum_required(VERSION 3.31.4)
-project(cs-455-raytracer)
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories(include)
-add_executable(cs-455-raytracer src/main.cpp src/Raytracer.cpp src/Scene.cpp)
-target_link_libraries(cs-455-raytracer ${OpenCV_LIBS})

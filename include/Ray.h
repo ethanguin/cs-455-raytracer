@@ -10,7 +10,7 @@ class Ray {
         Ray() {}
         Ray(const Point3 &origin_input, const Vect3<float> &direction_input) {
             orig = origin_input;
-            dir = direction_input;
+            dir = direction_input.normal();
         }
         const Point3 origin() const { return orig; }
         const Vect3<float> direction() const { return dir; }

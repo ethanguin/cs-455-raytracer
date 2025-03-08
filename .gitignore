@@ -3,10 +3,7 @@
 .vscode/settings.json
 .vscode/tasks.json
 /build/
-<<<<<<< HEAD
 .DS_Store
-=======
 src/.DS_Store
 /output/
 src/main.exe
->>>>>>> c7f3e950f4855955b8a128151a18073a7d5edbac
