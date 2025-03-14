@@ -14,6 +14,7 @@ public:
     float kd = 0.7;
     float ks = 0.2;
     float ka = 0.1;
+    float reflection = ks;
     Material() {}
     Material(Color baseColor) : baseColor(baseColor) {}
     Color getLighting(Normal &N, const Color &LightColor, const Point3 &LightDir, const Vect3<float> &RayDir);

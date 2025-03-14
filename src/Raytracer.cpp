@@ -71,7 +71,7 @@ Color Raytracer::traceRay(const Ray &r, int depth) {
     Color matColor = baseColor;
     // send out reflection ray and add it to the base color
     if (depth > 0) {
-        float specularLevel = closestObj->mat.ks;
+        float specularLevel = closestObj->mat.reflection;
         auto reflectionDir = (r.direction() - 2 * dot(r.direction(), N) * N).normal();
         Ray reflectionRay = Ray(r.at(closestT) + reflectionDir * 0.01, reflectionDir);
         Color reflectionColor = traceRay(reflectionRay, depth - 1);

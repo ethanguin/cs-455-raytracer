@@ -20,12 +20,11 @@ void createTestFrame(int i, int maxFrames);
 void renderTestAnimation() {
     int frameNum = 96;
 
-    // Create a vector to hold the threads
-    // for (int i = 0; i < frameNum; i++) {
-    //     createTestFrame(i, frameNum);
-    // }
-    // // bypass multithread
-    //return;
+    for (int i = 0; i < frameNum; i++) {
+        createTestFrame(i, frameNum);
+    }
+    // bypass multithread
+    return;
     std::vector<std::thread> threads;
     // Launch a thread for each frame
     
@@ -154,7 +153,11 @@ void createTestFrame(int i, int maxFrames) {
     }
     for (auto tri : star) {
         tri->mat.setBaseColor(Color(255, 241, 87));
-        tri->mat.setSpecColor(Color(255, 255, 255));
+        tri->mat.setSpecColor(tri->mat.baseColor);
+        tri->mat.ks = .45;
+        tri->mat.kd = .45;
+        tri->mat.ka = .1;
+        tri->mat.kgls = 20;
         tri->mat.ambientColor = ambLight;
     }
     scene1.addObjectList(star);
@@ -184,8 +187,258 @@ void createTestFrame(int i, int maxFrames) {
     camera.lookAt(Point3(0, 0, 0));
     scene1.setCamera(camera);
     Raytracer raytracer = Raytracer(scene1);
+    raytracer.setThreadNum(16);
     std::vector<pixel> image = raytracer.startRaytrace();
     exportPNG(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight, i);
+}
+
+void testScene1() {
+    std::string fileName = "EthanBishop_Raytracing_Pt2_Test1";
+    fileName = "../output/" + fileName;
+
+    float pi = 3.14159265359;
+    float circleRad = .65;
+
+    Scene scene1 = Scene();
+    Color ambLight = Color(0, 0, 0);
+    scene1.setBackgroundColor(Color(.2, .2, .2));
+
+    //reflective sphere
+        //     # reflective sphere
+        // Sphere
+        // Center 0.0 0.3 -1.0
+        // Radius 0.25
+        // Kd 0.0
+        // Ks 0.1
+        // Ka 0.1
+        // Od 0.75 0.75 0.75
+        // Os 1.0 1.0 1.0
+        // Kgls 10.0
+        // Refl .9
+    Object_3D *sphereReflect = new Sphere(0, .3, -1, .25);
+    sphereReflect->mat.setBaseColor(Color(191, 191, 191));
+    sphereReflect->mat.setSpecColor(Color(255, 255, 255));
+    sphereReflect->mat.ambientColor = ambLight;
+    sphereReflect->mat.ks = .4;
+    sphereReflect->mat.kd = 0;
+    sphereReflect->mat.ka = .1;
+    sphereReflect->mat.kgls = 10;
+    sphereReflect->mat.reflection = .9;
+    scene1.addObject(sphereReflect);
+
+    //triangle 1 - yellow
+    // # yellow triangle
+    // Triangle
+    // 0.0, -0.7, -0.5
+    // 0.0, -0.7, -1.5
+    // -1.0, 0.4, -1.0
+    // Kd 0.9
+    // Ks 1.0
+    // Ka 0.1
+    // Od 1.0 1.0 0.0
+    // Os 1.0 1.0 1.0
+    // Kgls 4.0
+    // Refl 0.0
+    Object_3D *triangle1 = new Triangle(Point3(0, -.7, -.5), Point3(0, -.7, -1.5), Point3(-1, .4, -1));
+    triangle1->mat.setBaseColor(Color(255, 255, 0));
+    triangle1->mat.setSpecColor(Color(255, 255, 255));
+    triangle1->mat.ambientColor = ambLight;
+    triangle1->mat.ks = 1;
+    triangle1->mat.kd = .9;
+    triangle1->mat.ka = .1;
+    triangle1->mat.kgls = 4;
+    triangle1->mat.reflection = 0;
+    scene1.addObject(triangle1);
+
+    //triangle 2 - blue
+    // # blue triangle
+    // Triangle
+    // 0.0 -0.7 -0.5
+    // 1.0, 0.4, -1.0
+    // 0.0, -0.7, -1.5
+    // Kd 0.9
+    // Ks 1.0
+    // Ka 0.1
+    // Od 0.0 0.0 1.0
+    // Os 1.0 1.0 1.0
+    // Kgls 4.0
+    // Refl 0.0
+    Object_3D *triangle2 = new Triangle(Point3(0, -.7, -.5), Point3(1, .4, -1), Point3(0, -.7, -1.5));
+    triangle2->mat.setBaseColor(Color(0, 0, 255));
+    triangle2->mat.setSpecColor(Color(255, 255, 255));
+    triangle2->mat.ambientColor = ambLight;
+    triangle2->mat.ks = 1;
+    triangle2->mat.kd = .9;
+    triangle2->mat.ka = .1;
+    triangle2->mat.kgls = 4;
+    triangle2->mat.reflection = 0;
+    scene1.addObject(triangle2);
+
+    scene1.addLight(new Light_Directional(0, 1, 0));
+    Camera camera = Camera(2000, 2000);
+    camera.move(0, 0, 1);
+    camera.lookAt(Point3(0, 0, 0));
+    scene1.setCamera(camera);
+    Raytracer raytracer = Raytracer(scene1);
+    raytracer.setThreadNum(32);
+    std::vector<pixel> image = raytracer.startRaytrace();
+    exportPNG(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight, 0);
+}
+
+void testScene2() {
+    std::string fileName = "EthanBishop_Raytracing_Pt2_Test2";
+    fileName = "../output/" + fileName;
+
+    float pi = 3.14159265359;
+    float circleRad = .65;
+
+    Scene scene1 = Scene();
+    Color ambLight = Color(0, 0, 0);
+    scene1.setBackgroundColor(Color(.2, .2, .2));
+
+    // white sphere
+    // Sphere
+    // Center 0.5 0.0 -0.15
+    // Radius 0.05
+    // Kd 0.8
+    // Ks 0.1
+    // Ka 0.3
+    // Od 1.0, 1.0, 1.0
+    // Os 1.0, 1.0, 1.0
+    // Kgls 4.0
+    // Refl 0.0
+    Object_3D *sphereWhite = new Sphere(.5, 0, -.15, .05);
+    sphereWhite->mat.setBaseColor(Color(255, 255, 255));
+    sphereWhite->mat.setSpecColor(Color(255, 255, 255));
+    sphereWhite->mat.ambientColor = ambLight;
+    sphereWhite->mat.ks = .1;
+    sphereWhite->mat.kd = .8;
+    sphereWhite->mat.ka = .3;
+    sphereWhite->mat.kgls = 4;
+    sphereWhite->mat.reflection = 0;
+    scene1.addObject(sphereWhite);
+
+    // red sphere
+    // Sphere
+    // Center 0.3 0.0 -0.1
+    // Radius 0.08
+    // Kd 0.8
+    // Ks 0.8
+    // Ka 0.1
+    // Od 1.0 0.0 0.0
+    // Os 0.5 1.0 0.5
+    // Kgls 32.0
+    // Refl 0.0
+    Object_3D *sphereRed = new Sphere(.3, 0, -.1, .08);
+    sphereRed->mat.setBaseColor(Color(255, 0, 0));
+    sphereRed->mat.setSpecColor(Color(127, 255, 127));
+    sphereRed->mat.ambientColor = ambLight;
+    sphereRed->mat.ks = .8;
+    sphereRed->mat.kd = .8;
+    sphereRed->mat.ka = .1;
+    sphereRed->mat.kgls = 32;
+    sphereRed->mat.reflection = 0;
+    scene1.addObject(sphereRed);
+
+    // green sphere
+    // Sphere
+    //   Center -0.6 0.0 0.0
+    //   Radius .3
+    //   Kd 0.7
+    //   Ks 0.5
+    //   Ka 0.1
+    //   Od 0.0 1.0 0.0
+    //   Os 0.5 1.0 0.5
+    //   Kgls 64.0
+    //   Refl 0.0
+    Object_3D *sphereGreen = new Sphere(-.6, 0, 0, .3);
+    sphereGreen->mat.setBaseColor(Color(0, 255, 0));
+    sphereGreen->mat.setSpecColor(Color(127, 255, 127));
+    sphereGreen->mat.ambientColor = ambLight;
+    sphereGreen->mat.ks = .5;
+    sphereGreen->mat.kd = .7;
+    sphereGreen->mat.ka = .1;
+    sphereGreen->mat.kgls = 64;
+    sphereGreen->mat.reflection = 0;
+    scene1.addObject(sphereGreen);
+
+    //     # reflective sphere
+    // Sphere
+    // Center 0.1 -0.55 0.25
+    // Radius 0.3
+    // Kd 0.0
+    // Ks 0.1
+    // Ka 0.1
+    // Od 0.75 0.75 0.75
+    // Os 1.0 1.0 1.0
+    // Kgls 10.0
+    // Refl 0.9
+    Object_3D *sphereReflect = new Sphere(.1, -.55, .25, .3);
+    sphereReflect->mat.setBaseColor(Color(191, 191, 191));
+    sphereReflect->mat.setSpecColor(Color(255, 255, 255));
+    sphereReflect->mat.ambientColor = ambLight;
+    sphereReflect->mat.ks = .1;
+    sphereReflect->mat.kd = 0;
+    sphereReflect->mat.ka = .1;
+    sphereReflect->mat.kgls = 10;
+    sphereReflect->mat.reflection = .9;
+    scene1.addObject(sphereReflect);
+
+    //     # blue triangle
+    // Triangle
+    // 0.3 -0.3 -0.4
+    // 0.0 0.3 -0.1
+    // -0.3 -0.3 0.2
+    // Kd 0.9
+    // Ks 0.9
+    // Ka 0.1
+    // Od 0.0 0.0 1.0
+    // Os 1.0 1.0 1.0
+    // Kgls 32.0
+    // Refl 0.0
+    Object_3D *triangleBlue = new Triangle(Point3(.3, -.3, -.4), Point3(0, .3, -.1), Point3(-.3, -.3, .2));
+    triangleBlue->mat.setBaseColor(Color(0, 0, 255));
+    triangleBlue->mat.setSpecColor(Color(255, 255, 255));
+    triangleBlue->mat.ambientColor = ambLight;
+    triangleBlue->mat.ks = .9;
+    triangleBlue->mat.kd = .9;
+    triangleBlue->mat.ka = .1;
+    triangleBlue->mat.kgls = 32;
+    triangleBlue->mat.reflection = 0;
+    scene1.addObject(triangleBlue);
+
+    //     # yellow triangle
+    // Triangle
+    // -0.2 0.1 0.1
+    // -0.2 -0.5 0.2
+    // -0.2 0.1 -0.3
+    // Kd 0.9
+    // Ks 0.5
+    // Ka 0.1
+    // Od 1.0 1.0 0.0
+    // Os 1.0 1.0 1.0
+    // Kgls 4.0
+    // Refl 0.0
+    Object_3D *triangleYellow = new Triangle(Point3(-.2, .1, .1), Point3(-.2, -.5, .2), Point3(-.2, .1, -.3));
+    triangleYellow->mat.setBaseColor(Color(255, 255, 0));
+    triangleYellow->mat.setSpecColor(Color(255, 255, 255));
+    triangleYellow->mat.ambientColor = ambLight;
+    triangleYellow->mat.ks = .5;
+    triangleYellow->mat.kd = .9;
+    triangleYellow->mat.ka = .1;
+    triangleYellow->mat.kgls = 4;
+    triangleYellow->mat.reflection = 0;
+    scene1.addObject(triangleYellow);
+
+    scene1.addLight(new Light_Directional(1, 0, 0));
+    Camera camera = Camera(2000, 2000);
+    camera.move(0, 0, 1);
+    camera.lookAt(Point3(0, 0, 0));
+    scene1.setCamera(camera);
+    Raytracer raytracer = Raytracer(scene1);
+    raytracer.setThreadNum(32);
+    std::vector<pixel> image = raytracer.startRaytrace();
+    exportPNG(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight, 0);
 }
 
 int main(int argc, char* argv[]) {
@@ -213,7 +466,10 @@ int main(int argc, char* argv[]) {
     // exportPNG(fileName, image, raytracer.scene.camera.imgWidth, raytracer.scene.camera.imgHeight, 0);
 
     // render an animation multithreaded
-    renderTestAnimation();
+    //renderTestAnimation();
+
+    testScene1();
+    testScene2();
     
 
     auto endRay1 = std::chrono::high_resolution_clock::now(); // End timer
